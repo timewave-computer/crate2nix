@@ -35,6 +35,7 @@ fn self_up_to_date() {
             other_metadata_options: vec![],
             use_cargo_lock_checksums: true,
             read_crate_hashes: true,
+            registry_hashes_json: PathBuf::from("./registry-hashes.json"),
         },
     )
     .unwrap();
@@ -83,6 +84,9 @@ fn assert_up_to_date(project_dir: &Path) {
         other_metadata_options: vec![],
         use_cargo_lock_checksums: true,
         read_crate_hashes: true,
+        registry_hashes_json: PathBuf::from("../")
+            .join(project_dir)
+            .join("./registry-hashes.json"),
     };
     let metadata = BuildInfo::for_config(
         &GenerateInfo {

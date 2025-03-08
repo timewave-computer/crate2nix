@@ -1269,7 +1269,7 @@ rec {
           {
             name = "windows_aarch64_gnullvm";
             packageId = "windows_aarch64_gnullvm";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "aarch64-pc-windows-gnullvm");
+            target = { target, features }: (target.name == "aarch64-pc-windows-gnullvm");
           }
           {
             name = "windows_aarch64_msvc";
@@ -1294,7 +1294,7 @@ rec {
           {
             name = "windows_x86_64_gnullvm";
             packageId = "windows_x86_64_gnullvm";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "x86_64-pc-windows-gnullvm");
+            target = { target, features }: (target.name == "x86_64-pc-windows-gnullvm");
           }
           {
             name = "windows_x86_64_msvc";
@@ -1385,6 +1385,8 @@ rec {
     This corresponds roughly to what buildRustCrate is setting.
   */
   makeDefaultTarget = platform: {
+    name = platform.rust.rustcTarget;
+
     unix = platform.isUnix;
     windows = platform.isWindows;
     fuchsia = true;
@@ -1699,7 +1701,7 @@ rec {
                   packageId: value: buildByPackageIdForPkgsImpl self pkgs packageId
                 )
                 crateConfigs;
-              target = makeTarget stdenv.hostPlatform;
+              target = makeTarget pkgs.stdenv.hostPlatform;
               build = mkBuiltByPackageIdByPkgs pkgs.buildPackages;
             };
           in

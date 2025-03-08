@@ -476,7 +476,7 @@ rec {
           {
             name = "libc";
             packageId = "libc";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "aarch64-linux-android");
+            target = { target, features }: (target.name == "aarch64-linux-android");
           }
           {
             name = "libc";
@@ -2747,12 +2747,12 @@ rec {
           {
             name = "winapi-i686-pc-windows-gnu";
             packageId = "winapi-i686-pc-windows-gnu";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "i686-pc-windows-gnu");
+            target = { target, features }: (target.name == "i686-pc-windows-gnu");
           }
           {
             name = "winapi-x86_64-pc-windows-gnu";
             packageId = "winapi-x86_64-pc-windows-gnu";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "x86_64-pc-windows-gnu");
+            target = { target, features }: (target.name == "x86_64-pc-windows-gnu");
           }
         ];
         features = {
@@ -3062,7 +3062,7 @@ rec {
           {
             name = "windows_aarch64_gnullvm";
             packageId = "windows_aarch64_gnullvm";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "aarch64-pc-windows-gnullvm");
+            target = { target, features }: (target.name == "aarch64-pc-windows-gnullvm");
           }
           {
             name = "windows_aarch64_msvc";
@@ -3077,7 +3077,7 @@ rec {
           {
             name = "windows_i686_gnullvm";
             packageId = "windows_i686_gnullvm";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "i686-pc-windows-gnullvm");
+            target = { target, features }: (target.name == "i686-pc-windows-gnullvm");
           }
           {
             name = "windows_i686_msvc";
@@ -3092,7 +3092,7 @@ rec {
           {
             name = "windows_x86_64_gnullvm";
             packageId = "windows_x86_64_gnullvm";
-            target = { target, features }: (stdenv.hostPlatform.rust.rustcTarget == "x86_64-pc-windows-gnullvm");
+            target = { target, features }: (target.name == "x86_64-pc-windows-gnullvm");
           }
           {
             name = "windows_x86_64_msvc";
@@ -3215,6 +3215,8 @@ rec {
     This corresponds roughly to what buildRustCrate is setting.
   */
   makeDefaultTarget = platform: {
+    name = platform.rust.rustcTarget;
+
     unix = platform.isUnix;
     windows = platform.isWindows;
     fuchsia = true;
@@ -3529,7 +3531,7 @@ rec {
                   packageId: value: buildByPackageIdForPkgsImpl self pkgs packageId
                 )
                 crateConfigs;
-              target = makeTarget stdenv.hostPlatform;
+              target = makeTarget pkgs.stdenv.hostPlatform;
               build = mkBuiltByPackageIdByPkgs pkgs.buildPackages;
             };
           in
