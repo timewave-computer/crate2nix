@@ -8,7 +8,6 @@ let
     "enableFeatures"
     "expandFeatures"
     "packageFeatures"
-    "pathsFromPathPattern"
   ];
   testsInFile = f:
     let

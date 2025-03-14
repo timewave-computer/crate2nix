@@ -20,7 +20,6 @@ let
 
   cargoNix = pkgs.callPackage ./crate2nix/Cargo.nix { inherit strictDeprecation defaultCrateOverrides; };
   crate2nix = cargoNix.rootCrate.build;
-  pathsFromPathPattern = (pkgs.callPackage ./nix/lib/paths-from-path-pattern.nix { }).pathsFromPathPattern;
 in
 rec {
 
@@ -433,37 +432,34 @@ rec {
               };
               src = builtins.fetchGit src-spec;
 
-              rootCargo = builtins.fromTOML (builtins.readFile "${src}/Cargo.toml");
-              isWorkspace = rootCargo ? "workspace";
-              isPackage = rootCargo ? "package";
-              containedCrates = lib.flatten (builtins.map (pathsFromPathPattern src) rootCargo.workspace.members)
-                ++ (if isPackage then [ "." ] else [ ]);
+              allCargoTomls = lib.filter
+                (lib.hasSuffix "Cargo.toml")
+                (lib.filesystem.listFilesRecursive src);
 
               getCrateNameFromPath = path:
                 let
-                  cargoTomlCrate = builtins.fromTOML (builtins.readFile "${src}/${path}/Cargo.toml");
+                  cargoTomlCrate = builtins.fromTOML (builtins.readFile path);
                 in
-                cargoTomlCrate.package.name;
+                  cargoTomlCrate.package.name or null;
 
-              pathToExtract =
-                if isWorkspace then
-                  builtins.head
-                    (builtins.filter
-                      (to_filter:
-                        (getCrateNameFromPath to_filter) == name
-                      )
-                      containedCrates)
-                else
-                  ".";
+              packageCargoToml =
+                builtins.head
+                  (builtins.filter
+                    (to_filter:
+                      (getCrateNameFromPath to_filter) == name
+                    )
+                    allCargoTomls);
+
+              pathToExtract = lib.removeSuffix "Cargo.toml" packageCargoToml;
             in
             pkgs.runCommand (lib.removeSuffix ".tar.gz" srcname) { }
               ''
                 mkdir -p $out
-                cp -apR ${src}/${pathToExtract}/* $out
+                cp -apR ${pathToExtract}/* $out
                 cd $out
 
                 mv ./Cargo.toml ./Cargo.toml.orig
-                ${crate2nix}/bin/crate2nix normalize-manifest --cargo-toml ${src}/${pathToExtract}/Cargo.toml > ./Cargo.toml
+                ${crate2nix}/bin/crate2nix normalize-manifest --cargo-toml ${pathToExtract}/Cargo.toml > ./Cargo.toml
 
                 echo '{"package":null,"files":{}}' > $out/.cargo-checksum.json
               '';
