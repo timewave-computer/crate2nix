@@ -39,6 +39,7 @@ rec {
     , additionalCargoNixArgs ? [ ]
     , additionalCrateHashes ? internal.parseOptHashesFile
         (src + "/crate-hashes.json")
+    , cargo ? pkgs.cargo
     }:
     let
       crateDir = dirOf (src + "/${cargoToml}");
@@ -51,7 +52,7 @@ rec {
     stdenv.mkDerivation {
       name = "${name}-crate2nix";
 
-      buildInputs = [ pkgs.cargo pkgs.jq crate2nix ];
+      buildInputs = [ cargo pkgs.jq crate2nix ];
       preferLocalBuild = true;
 
       inherit src;
