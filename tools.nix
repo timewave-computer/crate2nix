@@ -65,7 +65,7 @@ rec {
         export CARGO_HOME="$out/cargo"
         export HOME="$out"
 
-        cp ${vendor.cargoConfig} $out/cargo/config
+        cp ${vendor.cargoConfig} $out/cargo/config.toml
 
         crate_hashes="$out/crate-hashes.json"
         echo -n '${builtins.toJSON vendor.extendedHashes}' | jq > "$crate_hashes"
@@ -95,10 +95,10 @@ rec {
           ${lib.escapeShellArgs additionalCargoNixArgs} || {
           { set +x; } 2>/dev/null
           echo "crate2nix failed." >&2
-          echo "== cargo/config (BEGIN)" >&2
-          sed 's/^/    /' $out/cargo/config >&2
+          echo "== cargo/config.toml (BEGIN)" >&2
+          sed 's/^/    /' $out/cargo/config.toml >&2
           echo ""
-          echo "== cargo/config (END)" >&2
+          echo "== cargo/config.toml (END)" >&2
             echo ""
             echo "== crate-hashes.json (BEGIN)" >&2
           if [ -r $crate_hashes ]; then
