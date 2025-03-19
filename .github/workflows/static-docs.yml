@@ -35,8 +35,8 @@ jobs:
             nix_path: nixpkgs=channel:nixos-unstable
         - uses: cachix/cachix-action@v15
           with:
-            name: eigenvalue
-            signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+            name: timewave
+            authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
         - run: 'nix build .#docs'
         - name: Setup Pages
           uses: actions/configure-pages@v4
